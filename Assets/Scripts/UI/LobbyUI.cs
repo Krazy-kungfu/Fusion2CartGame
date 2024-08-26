@@ -38,6 +38,7 @@ public class LobbyUI : MonoBehaviour, IDisabledUI
 		RoomPlayer.PlayerChanged += (player) =>
 		{
 			var isLeader = RoomPlayer.Local.IsLeader;
+			Debug.Log(isLeader);
 			trackNameDropdown.interactable = isLeader;
 			gameTypeDropdown.interactable = isLeader;
 			customizeButton.interactable = !RoomPlayer.Local.IsReady;
@@ -108,7 +109,7 @@ public class LobbyUI : MonoBehaviour, IDisabledUI
 
 		ListItems.Add(player, obj);
 		
-		UpdateDetails(GameManager.Instance);
+		//UpdateDetails(GameManager.Instance);
 	}
 
 	private void RemovePlayer(RoomPlayer player)
@@ -133,7 +134,8 @@ public class LobbyUI : MonoBehaviour, IDisabledUI
 		var local = RoomPlayer.Local;
         if (local && local.Object && local.Object.IsValid)
         {
-            local.RPC_ChangeReadyState(!local.IsReady);
+			local.SetReady(!local.IsReady);
+            //local.RPC_ChangeReadyState(!local.IsReady);
         }
 	}
 

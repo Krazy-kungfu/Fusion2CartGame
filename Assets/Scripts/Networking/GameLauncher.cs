@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using Fusion.Addons.Physics;
 using Fusion.Sockets;
@@ -23,6 +24,8 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 	[SerializeField] private RoomPlayer _roomPlayerPrefab;
 	[SerializeField] private DisconnectUI _disconnectUI;
 
+	private RoomPlayer localRoomPlayer = null;
+
 	public static ConnectionStatus ConnectionStatus = ConnectionStatus.Disconnected;
 
 	private GameMode _gameMode;
@@ -44,8 +47,8 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 		SceneManager.LoadScene(LevelManager.LOBBY_SCENE);
 	}
 
-	public void SetCreateLobby() => _gameMode = GameMode.Host;
-	public void SetJoinLobby() => _gameMode = GameMode.Client;
+	public void SetCreateLobby() => _gameMode = GameMode.Shared;
+	public void SetJoinLobby() => _gameMode = GameMode.Shared;
 	
 	public void JoinOrCreateLobby()
 	{
@@ -74,7 +77,7 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 			ObjectProvider = _pool,
 			SceneManager = _levelManager,
 			PlayerCount = ServerInfo.MaxUsers,
-			EnableClientSessionCreation = false
+			//EnableClientSessionCreation = false
 		});
 	}
 
@@ -141,14 +144,20 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 	public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
 	{
 		Debug.Log($"Player {player} Joined!");
-		if (runner.IsServer)
-		{
-			if(_gameMode==GameMode.Host)
-				runner.Spawn(_gameManagerPrefab, Vector3.zero, Quaternion.identity);
+		//if (runner.IsServer)
+		//{
+		//if (_gameMode == GameMode.Host)
+		//	runner.Spawn(_gameManagerPrefab, Vector3.zero, Quaternion.identity);
+		if (localRoomPlayer == null) { 
 			var roomPlayer = runner.Spawn(_roomPlayerPrefab, Vector3.zero, Quaternion.identity, player);
 			roomPlayer.GameState = RoomPlayer.EGameState.Lobby;
+			SetConnectionStatus(ConnectionStatus.Connected);
+			localRoomPlayer = roomPlayer;
+			if (runner.ActivePlayers.Count() <= 1) {
+				localRoomPlayer.isHost = true;
+			}
 		}
-		SetConnectionStatus(ConnectionStatus.Connected);
+		//}
 	}
 
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)

@@ -4,10 +4,8 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class RoomPlayer : NetworkBehaviour
-{
-	public enum EGameState
-	{
+public class RoomPlayer : NetworkBehaviour {
+	public enum EGameState {
 		Lobby,
 		GameCutscene,
 		GameReady
@@ -18,9 +16,13 @@ public class RoomPlayer : NetworkBehaviour
 	public static Action<RoomPlayer> PlayerJoined;
 	public static Action<RoomPlayer> PlayerLeft;
 	public static Action<RoomPlayer> PlayerChanged;
+	public NetworkPrefabRef _gameManagerPrefab;
 
 	public static RoomPlayer Local;
 
+	public static bool hasSpawnedHost;
+
+	[Networked, OnChangedRender(nameof(OnSetHost))] public bool isHost { get; set; } = false;
 	[Networked] public NetworkBool IsReady { get; set; }
 	[Networked] public NetworkString<_32> Username { get; set; }
 	[Networked] public NetworkBool HasFinished { get; set; }
@@ -28,26 +30,43 @@ public class RoomPlayer : NetworkBehaviour
 	[Networked] public EGameState GameState { get; set; }
 	[Networked] public int KartId { get; set; }
 
-	public bool IsLeader => Object!=null && Object.IsValid && Object.HasStateAuthority;
+	public bool IsLeader => Object!=null && Object.IsValid && isHost && Object.HasStateAuthority;
 	
 	private ChangeDetector _changeDetector;
+
+	private void OnSetHost() {
+		if (Object.HasStateAuthority) {
+            Runner.Spawn(_gameManagerPrefab, Vector3.zero, Quaternion.identity);
+            PlayerChanged?.Invoke(this);
+        } 
+    }
 
 	public override void Spawned()
 	{
 		base.Spawned();
-		
+
+		//if (!hasSpawnedHost) {
+		//	Debug.Log("Not spawned host");
+		//	hasSpawnedHost = true;
+		//	//isHost = true;
+		//}
+
 		_changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
-		if (Object.HasInputAuthority)
+		if (Object.HasStateAuthority)
 		{
-			Local = this;
 
-			PlayerChanged?.Invoke(this);
-			RPC_SetPlayerStats(ClientInfo.Username, ClientInfo.KartId);
-		}
+            Local = this;
+            PlayerChanged?.Invoke(this);
+			Username = ClientInfo.Username;
+			KartId = ClientInfo.KartId;
+            //RPC_SetPlayerStats(ClientInfo.Username, ClientInfo.KartId);
+        }
 
 		Players.Add(this);
 		PlayerJoined?.Invoke(this);
+
+		Debug.Log($"Players {Players.Count}");
 
 		DontDestroyOnLoad(gameObject);
 	}
@@ -56,6 +75,7 @@ public class RoomPlayer : NetworkBehaviour
 	{
 		foreach (var change in _changeDetector.DetectChanges(this))
 		{
+			Debug.Log("changed");
 			switch (change)
 			{
 				case nameof(IsReady):
@@ -66,20 +86,20 @@ public class RoomPlayer : NetworkBehaviour
 		}
 	}
 
-	[Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+	[Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.Proxies)]
 	private void RPC_SetPlayerStats(NetworkString<_32> username, int kartId)
 	{
 		Username = username;
 		KartId = kartId;
 	}
 
-	[Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+	[Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.Proxies)]
 	public void RPC_SetKartId(int id)
 	{
 		KartId = id;
 	}
 
-	[Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+	[Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.Proxies)]
 	public void RPC_ChangeReadyState(NetworkBool state)
 	{
 		Debug.Log($"Setting {Object.Name} ready state to {state}");
@@ -106,5 +126,9 @@ public class RoomPlayer : NetworkBehaviour
 			Players.Remove(roomPlayer);
 			runner.Despawn(roomPlayer.Object);
 		}
+	}
+
+	public void SetReady(bool value) {
+		IsReady = value;
 	}
 }
