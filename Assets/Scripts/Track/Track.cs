@@ -73,7 +73,7 @@ public class Track : NetworkBehaviour, ICameraController
 			prefab,
 			point.position,
 			point.rotation,
-			player.Object.InputAuthority
+			player.Object.StateAuthority
 		);
 
 		entity.Controller.RoomUser = player;
