@@ -68,6 +68,8 @@ public class RoomPlayer : NetworkBehaviour {
 
 		Debug.Log($"Players {Players.Count}");
 
+		Debug.Log($"{RoomPlayer.Players.IndexOf(RoomPlayer.Local)}");
+
 		DontDestroyOnLoad(gameObject);
 	}
 	

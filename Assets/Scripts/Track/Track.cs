@@ -61,7 +61,8 @@ public class Track : NetworkBehaviour, ICameraController
 
 	public void SpawnPlayer(NetworkRunner runner, RoomPlayer player)
 	{
-		var index = RoomPlayer.Players.IndexOf(player);
+		//var index = RoomPlayer.Players.IndexOf(player);
+		var index = player.Object.StateAuthority.PlayerId - 1;
 		var point = spawnpoints[index];
 
 		var prefabId = player.KartId;

@@ -73,7 +73,7 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 		_runner.StartGame(new StartGameArgs
 		{
 			GameMode = _gameMode,
-			SessionName = _gameMode == GameMode.Host ? ServerInfo.LobbyName : ClientInfo.LobbyName,
+			SessionName = _gameMode == GameMode.Shared ? ServerInfo.LobbyName : ClientInfo.LobbyName,
 			ObjectProvider = _pool,
 			SceneManager = _levelManager,
 			PlayerCount = ServerInfo.MaxUsers,
@@ -143,7 +143,7 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
 	public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
 	{
-		Debug.Log($"Player {player} Joined!");
+		Debug.Log($"Player {player} Joined! -- Player Id is {player.PlayerId}");
 		//if (runner.IsServer)
 		//{
 		//if (_gameMode == GameMode.Host)

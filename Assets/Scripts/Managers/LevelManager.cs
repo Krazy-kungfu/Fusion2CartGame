@@ -26,9 +26,10 @@ namespace Managers
 		public static void LoadTrack(int sceneIndex)
 		{
 			Instance.Runner.LoadScene(SceneRef.FromIndex(sceneIndex));
+
 		}
 
-		protected override IEnumerator LoadSceneCoroutine(SceneRef sceneRef, NetworkLoadSceneParameters sceneParams)
+        protected override IEnumerator LoadSceneCoroutine(SceneRef sceneRef, NetworkLoadSceneParameters sceneParams)
 		{
 			Debug.Log($"Loading scene {sceneRef}");
 
@@ -42,13 +43,16 @@ namespace Managers
 			// Now we can safely spawn karts
 			if (GameManager.CurrentTrack != null && sceneRef.AsIndex > LOBBY_SCENE)
 			{
-				if (Runner.GameMode == GameMode.Host)
+				if (Runner.GameMode == GameMode.Shared)
 				{
-					foreach (var player in RoomPlayer.Players)
-					{
-						player.GameState = RoomPlayer.EGameState.GameCutscene;
-						GameManager.CurrentTrack.SpawnPlayer(Runner, player);
-					}
+					//foreach (var player in RoomPlayer.Players)
+					//{
+					//	player.GameState = RoomPlayer.EGameState.GameCutscene;
+					//	GameManager.CurrentTrack.SpawnPlayer(Runner, player);
+					//}
+
+					RoomPlayer.Local.GameState = RoomPlayer.EGameState.GameCutscene;
+					GameManager.CurrentTrack.SpawnPlayer(Runner, RoomPlayer.Local);
 				}
 			}
 
