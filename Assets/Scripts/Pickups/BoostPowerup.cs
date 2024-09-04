@@ -13,8 +13,13 @@ public class BoostPowerup : SpawnedPowerup {
     }
 
     public override void Spawned() {
-        base.Spawned();
+        //base.Spawned();
 
+        //Runner.Despawn(Object);
+        Invoke("Despawn", 1f);
+    }
+
+    public void Despawn() {
         Runner.Despawn(Object);
     }
 }

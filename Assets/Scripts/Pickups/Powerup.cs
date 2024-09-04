@@ -13,9 +13,13 @@ public class Powerup : ScriptableObject
             var position = user.itemDropNode.position;
             var rotation = user.itemDropNode.rotation;
 
+            Debug.Log(user);
+
             if (runner.CanSpawn)
             {
+                Debug.Log(prefab);
                 var obj = runner.Spawn(prefab, position, rotation, null, null);
+                Debug.Log(obj);
                 obj.Init(user);
             }
         }
