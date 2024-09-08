@@ -180,7 +180,7 @@ public class GameLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
 		if(_runner)
 			Destroy(_runner.gameObject);
-		
+
 		// Reset the object pools
 		_pool.ClearPools();
 		_pool = null;

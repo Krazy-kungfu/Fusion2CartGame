@@ -51,6 +51,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _HasInit:
     _value: 0
+  _isColliderOn:
+    _value: 0
   collider: {fileID: 6596831362145196467}
   enableDelay: 1
 --- !u!135 &6596831362145196467
@@ -115,7 +117,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 3495489839
   ObjectInterest: 0
-  Flags: 264449
+  Flags: 526593
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 2750590977578721003}
