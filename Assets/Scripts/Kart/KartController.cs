@@ -217,6 +217,7 @@ public class KartController : KartComponent
 					OnDriftTierIndexChangedCallback(this);
 					break;
 				case nameof(IsSpinout):
+					Debug.Log("SPINOUT");
 					OnSpinoutChangedCallback(this);
 					break;
 				case nameof(BackfireTimer):

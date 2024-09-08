@@ -18,7 +18,7 @@ public class Powerup : ScriptableObject
             if (runner.CanSpawn)
             {
                 Debug.Log(prefab);
-                var obj = runner.Spawn(prefab, position, rotation, null, null);
+                var obj = runner.Spawn(prefab, position, rotation, runner.LocalPlayer);
                 Debug.Log(obj);
                 obj.Init(user);
             }
